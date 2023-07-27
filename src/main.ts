@@ -13,12 +13,12 @@ const keySystem = "com.apple.fps.3_0";
 // this is the base URL for the test content that we are using for multi key
 // if you change that, note that you also need to adjust the segment loading
 // for the MSE example
-const base_url = "http://localhost:8000/fps_shaka/pkg"
+const base_url = "https://content.players.castlabs.com/fps_multikey_debug/multi-key"
 
 // this is the base URL for the test content that we are using for single key
 // if you change that, note that you also need to adjust the segment loading
 // for the MSE example
-const base_url_single_key = "http://localhost:8000/fps_shaka_single_key/pkg"
+const base_url_single_key = "https://content.players.castlabs.com/fps_multikey_debug/single-key"
 
 // Load the native AV Player with the master playlist
 const exampleAvPlayer = getExampleElements("example-av-player");
