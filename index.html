@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <link rel="icon" href="https://players.castlabs.com/favicon.svg"
+        type="image/svg+xml">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FPS Multi-Key</title>
+
+  <style>
+  * {
+      box-sizing: border-box;
+      padding: 0;
+      margin: 0;
+  }
+
+  html {
+      font-family: sans-serif;
+  }
+
+  h1 {
+      margin: 2rem 0;
+  }
+
+  h2 {
+      margin: 1rem 0;
+  }
+
+  h3 {
+      margin: .5rem 0;
+  }
+
+  video {
+      width: 100% !important;
+      height: auto !important;
+  }
+
+  ol {
+      margin: .5rem 0;
+  }
+
+  #app {
+      width: 800px;
+      height: auto;
+      margin: 0 auto;
+  }
+
+  .player-container {
+      background-color: black;
+      position: relative;
+      padding-bottom: calc(1080 / 2578 * 100%);
+      height: 0;
+
+      margin: 1rem 0;
+  }
+
+  .player {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: auto;
+  }
+
+  .logs {
+      width: 15rem;
+      position: absolute;
+      top: 0;
+
+      padding: .5rem;
+
+      color: #f9f9f9;
+      background-color: rgba(70, 72, 100, 0.74);
+  }
+
+  .logs.long {
+      width: 30rem;
+  }
+
+  .time {
+      top: auto;
+      bottom: 0;
+  }
+
+  .controls {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      top: 0;
+      right: 0;
+
+      display: flex;
+
+      align-items: flex-end;
+      justify-content: flex-end;
+      padding: .5rem;
+  }
+
+  .controls button {
+      padding: .5rem;
+      background-color: rgba(255, 0, 0, 0.92);
+      border-radius: .5rem;
+      border: none;
+      color: #f9f9f9;
+  }
+
+
+  .fake-size {
+      width: 2578px !important;
+      height: 1080px !important;
+
+      scale: 31%;
+      transform-origin: 0 50%;
+      overflow: hidden;
+  }
+
+  .example {
+      padding: 1rem 0;
+      border-bottom: 2px solid #b7b7b7;
+  }
+
+  .example p {
+      margin-bottom: .5rem;
+  }
+
+  .event-logs {
+      border-bottom-right-radius: 1rem;
+  }
+
+  .event-logs div {
+      font-family: monospace;
+      line-height: 1.25rem;
+  }
+
+  .failed {
+      color: #ff2d2d;
+  }
+
+  .success {
+      color: #5f9b00;
+  }
+  </style>
+</head>
+
+<body>
+<div id="app">
+
+  <h1>FPS + EME Multi-Key Issue</h1>
+
+  <div class="example" id="example-mse-multi-key">
+    <h2>MSE + EME with different SD and HD Keys
+      <span class="failed">does not work!</span></h2>
+    <p>
+      This is the problematic setup that does not work. We are creating
+      a media source here and listen to <code>encrypted</code> events with
+      <code>sinf</code> init data.
+      We are pushing segments in the following order:
+    </p>
+    <ol>
+      <li>HD Init segment. This triggers an <code>encrypted</code> event and
+        we load the HD key.
+      </li>
+      <li>HD Segment 1 (0s - 4s)</li>
+      <li>SD Init segment. This triggers an <code>encrypted</code> event and
+        we load the SD key.
+      </li>
+      <li>SD Segment 2 (4s - 8s)</li>
+      <li>SD Segment 3 (8s - 12s)</li>
+    </ol>
+    <p>
+      Keys are loaded successfully for both SD and
+      HD renditions and playback starts and plays until the segment transition
+      from HD to SD at 4 seconds. We do receive a <code>resize</code> event
+      but the <b>video freezes</b>. There is no indication of any error and even
+      the <code>timeupdate</code> events keep on coming in.
+    </p>
+
+    <div class="block">
+      <div class="player-container">
+        <video class="player"></video>
+
+        <div class="controls">
+          <button class="btn-load">Load</button>
+        </div>
+
+        <div class="logs long event-logs">
+          <h3>Event Logs</h3>
+        </div>
+
+        <div class="logs time">
+          <div>Time-Update -.--- s</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="example" id="example-av-player">
+    <h2>AVPlayer with <code>encrypted</code> event. <span class="success">Works!</span> </h2>
+    <p>
+      This is the base implementation that uses AVPlayer and the video element
+      directly and loads an HLS playlist with <code>skd</code> init data.
+    </p>
+    <p>
+      We are using a bit of scaling and sizing CSS here to make the video
+      element appear large enough to AVPlayer to decide to scale up to the HD
+      rendition.
+    </p>
+    <p>
+      Watch the even log on screen. When the resize event occurs that indicates
+      that the video element resized to 1080p, the player successfully switched
+      from SD to HD and handled the license transition well.
+    </p>
+
+    <div class="block">
+      <div class="player-container">
+        <video class="player fake-size" width="2578" height="1080"></video>
+
+        <div class="controls">
+          <button class="btn-load">Load</button>
+        </div>
+
+        <div class="logs long event-logs">
+          <h3>Event Logs</h3>
+        </div>
+
+        <div class="logs time">
+          <div>Time-Update -.--- s</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="example" id="example-mse-single-key">
+    <h2>MSE + EME with a single key for SD and HD. <span class="success">Works!</span></h2>
+    <p>
+      This example uses our single key test content and switches
+      between HD and SD renditions.
+    </p>
+    <div class="block">
+      <div class="player-container">
+        <video class="player"></video>
+
+        <div class="controls">
+          <button class="btn-load">Load</button>
+        </div>
+
+        <div class="logs long event-logs">
+          <h3>Event Logs</h3>
+        </div>
+
+        <div class="logs time">
+          <div>Time-Update -.--- s</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="example">
+    <h2>MSE + EME SD Only and HD Only. <span class="success">Works!</span></h2>
+
+    <p>
+      This is the same setup and uses the same source and rendition as with
+      the multi key example, but we play only the SD or HD renditions
+      respectively to make sure that each rendition plays standalone.
+    </p>
+    <p>
+      <b>Note</b> that we are not pushing the full content but only the first 4
+      segments so video playback will stall at around 16 seconds.
+    </p>
+
+    <div id="example-mse-sd-only">
+      <h3>SD Only</h3>
+      <div class="block">
+        <div class="player-container">
+          <video class="player"></video>
+
+          <div class="controls">
+            <button class="btn-load">Load</button>
+          </div>
+
+          <div class="logs long event-logs">
+            <h3>Event Logs</h3>
+          </div>
+
+          <div class="logs time">
+            <div>Time-Update -.--- s</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div id="example-mse-hd-only">
+      <h3>HD Only</h3>
+      <div class="block">
+        <div class="player-container">
+          <video class="player"></video>
+
+          <div class="controls">
+            <button class="btn-load">Load</button>
+          </div>
+
+          <div class="logs long event-logs">
+            <h3>Event Logs</h3>
+          </div>
+
+          <div class="logs time">
+            <div>Time-Update -.--- s</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>
