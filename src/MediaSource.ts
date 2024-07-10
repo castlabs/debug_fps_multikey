@@ -1,4 +1,4 @@
-import {Queue} from "./queue.js";
+import {Queue} from "./Queue.js";
 
 import {log, bufferString, one} from "./debug.js"
 import {EventBus} from "./EventBus";
@@ -55,6 +55,21 @@ export function bufferedAhead(video:HTMLVideoElement, playHead:number) {
   return bufferAhead
 }
 
+function getMediaSource():MediaSource {
+  // @ts-ignore
+  if (window.ManagedMediaSource) {
+      log('[MSE]', 'Using ManagedMediaSource')
+      // @ts-ignore
+      return new window.ManagedMediaSource();
+  }
+
+  if (window.MediaSource) {
+      log('[MSE]', 'Using MediaSource')
+      return new window.MediaSource();
+  }
+  throw "No MediaSource API available";
+}
+
 export class MSE {
   private readonly mediaSource: MediaSource;
   private readonly video: HTMLVideoElement;
@@ -64,8 +79,9 @@ export class MSE {
   private readonly openPromise_: Promise<void>;
 
   constructor(video: HTMLVideoElement) {
-    this.mediaSource = new MediaSource();
+    this.mediaSource = getMediaSource()
     this.video = video;
+    this.video.disableRemotePlayback = true;
     this.sourceBuffer = null;
     this.queue_ = null;
     this.abortController = [];

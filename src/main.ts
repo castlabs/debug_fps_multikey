@@ -8,7 +8,7 @@ const certificate = await fetch(
   .then(r => r.arrayBuffer());
 
 // The key system we want to use
-const keySystem = "com.apple.fps.3_0";
+const keySystem = "com.apple.fps";
 
 // this is the base URL for the test content that we are using for multi key
 // if you change that, note that you also need to adjust the segment loading
@@ -303,8 +303,8 @@ async function loadDrmLicense(event: MediaKeyMessageEvent) {
 type ExampleElements = {
   video: HTMLVideoElement,
   logs: HTMLElement,
-  currentTime: HTMLElement
-  loadButton: HTMLElement
+  currentTime: HTMLElement,
+  loadButton: HTMLElement,
 }
 
 function getExampleElements(id: string): ExampleElements {
