@@ -3,7 +3,7 @@ import {MSE} from "./MediaSource";
 import {log} from "./debug";
 
 // Make sure we load the FPS certificate ahead of time
-const certificate = await fetch(
+const certificate = fetch(
   'https://lic.staging.drmtoday.com/license-server-fairplay/cert/client_dev')
   .then(r => r.arrayBuffer());
 
@@ -215,7 +215,7 @@ async function handleEncryptedEvent(event: MediaEncryptedEvent, logTarget: HTMLE
       }]);
 
       const keys = await access.createMediaKeys();
-      await keys.setServerCertificate(certificate);
+      await keys.setServerCertificate(await certificate);
       await video.setMediaKeys(keys);
       log('[EME] Media Keys Initialized and loaded')
     }
