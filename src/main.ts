@@ -4,7 +4,7 @@ import {log} from "./debug";
 
 // Make sure we load the FPS certificate ahead of time
 const certificate = await fetch(
-  'https://lic.staging.drmtoday.com/license-server-fairplay/cert/client_dev')
+  'https://fpdemo.dev.ife.castlabs.com')
   .then(r => r.arrayBuffer());
 
 // The key system we want to use
@@ -280,23 +280,39 @@ function logBuffer(videoElement: HTMLVideoElement): string {
  * @param event The media key message event
  */
 async function loadDrmLicense(event: MediaKeyMessageEvent) {
-  const encodedKey = encodeURIComponent('spc');
-  const encodedValue = encodeURIComponent(base64EncodeUint8Array(new Uint8Array(event.message)));
-  const licenseResponse = await fetch('https://lic.staging.drmtoday.com/license-server-fairplay/', {
+  // Settings requirements:
+  // the key/key_id/iv as base64url strings
+  // hdcp values:
+  //  0 => type 0
+  //  1 => type 1
+  //  2 => ignore hdcp setting
+  // security levels:
+  //  0 => ignore security level
+  //  1 => Apple Baseline
+  //  2 => Apple Main
+  //  3 => Audio
+  const settings = [
+    {
+      "hdcp": 0,
+      "security_level": 1,
+      "key_id": "AAAAAAAAAAAAAAAAAAAAEQ==",
+      "key": "AAAAAAAAAAAAAAAAAAAAEQ==",
+      "iv": "AAAAAAAAAAAAAAAAAAAAEQ=="
+    },
+    {
+      "hdcp": 0,
+      "security_level": 2,
+      "key_id": "AAAAAAAAAAAAAAAAAAAAEA==",
+      "key": "AAAAAAAAAAAAAAAAAAAAEA==",
+      "iv": "AAAAAAAAAAAAAAAAAAAAEA=="
+    }
+  ];
+  const query = encodeURIComponent(btoa(JSON.stringify(settings)));
+  const licenseResponse = await fetch('https://fpdemo.dev.ife.castlabs.com/?settings=' + query, {
     method: 'POST',
-    headers: new Headers({
-      'Content-type': 'application/x-www-form-urlencoded',
-      'dt-custom-data': btoa(JSON.stringify({
-        "userId": "purchase",
-        "sessionId": "default",
-        "merchant": "client_dev"
-      }))
-    }),
-    body: encodedKey + "=" + encodedValue
+    body: new Uint8Array(event.message)
   })
-    .then(r => r.text())
-    .then(r => r.trim())
-  return base64DecodeUint8Array(licenseResponse);
+  return licenseResponse.arrayBuffer();
 }
 
 
