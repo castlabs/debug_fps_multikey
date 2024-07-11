@@ -152,10 +152,12 @@
     <h2>MSE + EME with different SD and HD Keys
       <span class="failed">does not work!</span></h2>
     <p>
-      This is the problematic setup that does not work. We are creating
+      This is the problematic setup that does not work on Desktop Safari. We are creating
       a media source here and listen to <code>encrypted</code> events with
       <code>sinf</code> init data.
-      We are pushing segments in the following order:
+    </p>
+    <p>
+      Segments are pushed in the following order:
     </p>
     <ol>
       <li>HD Init segment. This triggers an <code>encrypted</code> event and
@@ -178,7 +180,7 @@
 
     <div class="block">
       <div class="player-container">
-        <video class="player"></video>
+        <video class="player" playsinline></video>
 
         <div class="controls">
           <button class="btn-load">Load</button>
@@ -214,7 +216,7 @@
 
     <div class="block">
       <div class="player-container">
-        <video class="player fake-size" width="2578" height="1080"></video>
+        <video class="player fake-size" width="2578" height="1080" playsinline></video>
 
         <div class="controls">
           <button class="btn-load">Load</button>
@@ -240,7 +242,7 @@
     </p>
     <div class="block">
       <div class="player-container">
-        <video class="player"></video>
+        <video class="player" playsinline></video>
 
         <div class="controls">
           <button class="btn-load">Load</button>
@@ -274,7 +276,7 @@
       <h3>SD Only</h3>
       <div class="block">
         <div class="player-container">
-          <video class="player"></video>
+          <video class="player" playsinline></video>
 
           <div class="controls">
             <button class="btn-load">Load</button>
@@ -296,7 +298,7 @@
       <h3>HD Only</h3>
       <div class="block">
         <div class="player-container">
-          <video class="player"></video>
+          <video class="player" playsinline></video>
 
           <div class="controls">
             <button class="btn-load">Load</button>
