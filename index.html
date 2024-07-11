@@ -152,7 +152,7 @@
     <h2>MSE + EME with different SD and HD Keys
       <span class="failed">does not work!</span></h2>
     <p>
-      This is the problematic setup that does not work on Desktop Safari. We are creating
+      This is the problematic setup that does not work on <b>Desktop Safari</b>. We are creating
       a media source here and listen to <code>encrypted</code> events with
       <code>sinf</code> init data.
     </p>
@@ -176,6 +176,10 @@
       from HD to SD at 4 seconds. We do receive a <code>resize</code> event
       but the <b>video freezes</b>. There is no indication of any error and even
       the <code>timeupdate</code> events keep on coming in.
+    </p>
+
+    <p>
+      Note that seems is working fine on iOS but does not work as expected on Desktop Safari.
     </p>
 
     <div class="block">
