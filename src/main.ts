@@ -429,3 +429,9 @@ export function logVideoEvents(element: HTMLVideoElement, name: string) {
     })
   })
 }
+
+const uaTarget = document.getElementById('useragent')
+
+if (uaTarget) {
+  uaTarget.innerText = navigator.userAgent
+}
